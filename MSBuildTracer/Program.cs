@@ -24,7 +24,7 @@ namespace MSBuildTracer
             if (args.Length == 2)
             {
                 var property = project.AllEvaluatedProperties.FirstOrDefault(
-                    x => string.Equals(x.Name, args[1], StringComparison.OrdinalIgnoreCase));
+                    p => string.Equals(p.Name, args[1], StringComparison.OrdinalIgnoreCase));
                 if (property != null)
                 {
                     TraceProperty(property);
@@ -36,7 +36,7 @@ namespace MSBuildTracer
             }
             else
             {
-                var properties = project.AllEvaluatedProperties;
+                var properties = project.AllEvaluatedProperties.OrderBy(p => p.Name);
                 foreach (var property in properties)
                 {
                     TraceProperty(property);
