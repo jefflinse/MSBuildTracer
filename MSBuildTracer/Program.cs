@@ -19,7 +19,17 @@ namespace MSBuildTracer
             }
 
             var projectFile = args[0];
-            var project = new MBE.Project(projectFile);
+            MBE.Project project;
+
+            try
+            {
+                project = new MBE.Project(projectFile);
+            }
+            catch (Microsoft.Build.Exceptions.InvalidProjectFileException)
+            {
+                Console.WriteLine($"The project file '{args[0]}' is invalid or doesn't exist.");
+                return;
+            }
 
             if (args.Length == 2)
             {
