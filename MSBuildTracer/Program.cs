@@ -31,7 +31,7 @@ namespace MSBuildTracer
                 }
                 else
                 {
-                    Console.WriteLine("'{0}' is not defined anywhere for this project.", args[1]);
+                    Console.WriteLine($"'{args[1]}' is not defined anywhere for this project.");
                 }
             }
             else
@@ -61,10 +61,10 @@ namespace MSBuildTracer
 
         private static void PrintPropertyInfo(MBE.ProjectProperty property, int indentCount)
         {
-            var spaces = new string('\t', indentCount);
+            var indent = new string('\t', indentCount);
             string location;
 
-            Console.WriteLine("[" + property.Name + "]");
+            Console.WriteLine($"[{property.Name}]");
 
             if (property.IsEnvironmentProperty)
             {
@@ -76,19 +76,19 @@ namespace MSBuildTracer
             }
             else
             {
-                location = property.Xml.Location.File + ":" + property.Xml.Location.Line;
+                location = $"{property.Xml.Location.File}:{property.Xml.Location.Line}";
             }
 
-            Console.WriteLine(spaces + "Location:  " + location);
+            Console.WriteLine($"{indent}Location:  {location}");
 
             if (property.UnevaluatedValue == property.EvaluatedValue)
             {
-                Console.WriteLine(spaces + "Value:     " + property.EvaluatedValue);
+                Console.WriteLine($"{indent}Value:     {property.EvaluatedValue}");
             }
             else
             {
-                Console.WriteLine(spaces + "U-Value:   " + property.UnevaluatedValue);
-                Console.WriteLine(spaces + "E-Value:   " + property.EvaluatedValue);
+                Console.WriteLine($"{indent}U-Value:   {property.UnevaluatedValue}");
+                Console.WriteLine($"{indent}E-Value:   {property.EvaluatedValue}");
             }
 
             Console.WriteLine();
