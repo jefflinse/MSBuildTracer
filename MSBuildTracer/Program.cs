@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 using MBE = Microsoft.Build.Evaluation;
 
@@ -31,26 +30,29 @@ namespace MSBuildTracer
                 return;
             }
 
+            IEnumerable<MBE.ProjectProperty> properties;
+
             if (args.Length == 2)
             {
-                var property = project.AllEvaluatedProperties.FirstOrDefault(
-                    p => string.Equals(p.Name, args[1], StringComparison.OrdinalIgnoreCase));
-                if (property != null)
-                {
-                    TraceProperty(property);
-                }
-                else
-                {
-                    Console.WriteLine($"'{args[1]}' is not defined anywhere for this project.");
-                }
+                properties = project.AllEvaluatedProperties.Where(p => PropertyNameMatchesPattern(p.Name, args[1]));
             }
             else
             {
-                var properties = project.AllEvaluatedProperties.OrderBy(p => p.Name);
-                foreach (var property in properties)
-                {
-                    TraceProperty(property);
-                }
+                properties = project.AllEvaluatedProperties.OrderBy(p => p.Name);
+            }
+
+            if (!properties.Any())
+            {
+                string searchVerb = args.Length == 2 && args[1].Contains("*") ? "matching" : "named";
+                Console.WriteLine($"No property {searchVerb} '{args[1]}' is defined anywhere for this project.");
+                return;
+            }
+
+            foreach (var property in properties)
+            {
+                Console.WriteLine($"[{property.Name}]");
+                TraceProperty(property);
+                Console.WriteLine();
             }
         }
 
@@ -73,8 +75,6 @@ namespace MSBuildTracer
         {
             var indent = new string('\t', indentCount);
             string location;
-
-            Console.WriteLine($"[{property.Name}]");
 
             if (property.IsEnvironmentProperty)
             {
@@ -100,8 +100,11 @@ namespace MSBuildTracer
                 Console.WriteLine($"{indent}U-Value:   {property.UnevaluatedValue}");
                 Console.WriteLine($"{indent}E-Value:   {property.EvaluatedValue}");
             }
+        }
 
-            Console.WriteLine();
+        private static bool PropertyNameMatchesPattern(string propertyName, string pattern)
+        {
+            return new Regex($"^{pattern.Replace("*", ".*")}$", RegexOptions.IgnoreCase).Match(propertyName).Success;
         }
 
         private static void Usage()
