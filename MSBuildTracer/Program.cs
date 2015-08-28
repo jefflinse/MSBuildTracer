@@ -1,115 +1,124 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
-using MBE = Microsoft.Build.Evaluation;
+using MBEV = Microsoft.Build.Evaluation;
 
 namespace MSBuildTracer
 {
+    enum Mode { Properties, Targets };
+
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            if (args.Length == 0)
+            var options = Options.ProcessCommandLineArguments(args);
+            if (!options.Valid)
             {
                 Usage();
-                return;
+                return 1;
             }
 
-            var projectFile = args[0];
-            MBE.Project project;
+            MBEV.Project project;
 
             try
             {
-                project = new MBE.Project(projectFile);
+                project = new MBEV.Project(options.Filename);
             }
             catch (Microsoft.Build.Exceptions.InvalidProjectFileException)
             {
-                Console.WriteLine($"The project file '{args[0]}' is invalid or doesn't exist.");
-                return;
+                Console.WriteLine($"The project file '{args[1]}' is invalid or doesn't exist.");
+                return 1;
             }
 
-            IEnumerable<MBE.ProjectProperty> properties;
-
-            if (args.Length == 2)
+            switch (options.Mode)
             {
-                properties = project.AllEvaluatedProperties.Where(p => PropertyNameMatchesPattern(p.Name, args[1]));
-            }
-            else
-            {
-                properties = project.AllEvaluatedProperties.OrderBy(p => p.Name);
+                case Mode.Properties:
+
+                    var properties = project.AllEvaluatedProperties.Where(
+                        p => PropertyTracer.PropertyNameMatchesPattern(p.Name, options.Query));
+
+                    if (!properties.Any())
+                    {
+                        Console.WriteLine($"No property matching '{options.Query}' is defined anywhere for this project.");
+                    }
+
+                    foreach (var property in properties)
+                    {
+                        Console.WriteLine($"[{property.Name}]");
+                        PropertyTracer.Trace(property);
+                        Console.WriteLine();
+                    }
+
+                    break;
+
+                case Mode.Targets:
+
+                    var tracer = new TargetTracer(project);
+
+                    var targets = project.Targets.Where(t => TargetTracer.TargetNameMatchesPattern(t.Key, options.Query)).Select(t => t.Value);
+
+                    if (!targets.Any())
+                    {
+                        Console.WriteLine($"No target matching '{options.Query}' is defined anywhere for this project.");
+                    }
+
+                    foreach (var target in targets)
+                    {
+                        tracer.Trace(target);
+                        Console.WriteLine();
+                    }
+
+                    break;
             }
 
-            if (!properties.Any())
-            {
-                string searchVerb = args.Length == 2 && args[1].Contains("*") ? "matching" : "named";
-                Console.WriteLine($"No property {searchVerb} '{args[1]}' is defined anywhere for this project.");
-                return;
-            }
-
-            foreach (var property in properties)
-            {
-                Console.WriteLine($"[{property.Name}]");
-                TraceProperty(property);
-                Console.WriteLine();
-            }
-        }
-
-        private static void TraceProperty(MBE.ProjectProperty property, int traceLevel = 0)
-        {
-            if (property == null || property.IsGlobalProperty || property.IsReservedProperty)
-            {
-                return;
-            }
-
-            PrintPropertyInfo(property, traceLevel);
-
-            if (property.IsImported)
-            {
-                TraceProperty(property.Predecessor, traceLevel + 1);
-            }
-        }
-
-        private static void PrintPropertyInfo(MBE.ProjectProperty property, int indentCount)
-        {
-            var indent = new string('\t', indentCount);
-            string location;
-
-            if (property.IsEnvironmentProperty)
-            {
-                location = "(environment)";
-            }
-            else if (property.IsReservedProperty)
-            {
-                location = "(reserved)";
-            }
-            else
-            {
-                location = $"{property.Xml.Location.File}:{property.Xml.Location.Line}";
-            }
-
-            Console.WriteLine($"{indent}Location:  {location}");
-
-            if (property.UnevaluatedValue == property.EvaluatedValue)
-            {
-                Console.WriteLine($"{indent}Value:     {property.EvaluatedValue}");
-            }
-            else
-            {
-                Console.WriteLine($"{indent}U-Value:   {property.UnevaluatedValue}");
-                Console.WriteLine($"{indent}E-Value:   {property.EvaluatedValue}");
-            }
-        }
-
-        private static bool PropertyNameMatchesPattern(string propertyName, string pattern)
-        {
-            return new Regex($"^{pattern.Replace("*", ".*")}$", RegexOptions.IgnoreCase).Match(propertyName).Success;
+            return 0;
         }
 
         private static void Usage()
         {
-            Console.WriteLine("usage:\n\tMSBuildTracer filename [propertyname]");
+            Console.WriteLine("usage:\n\tMSBuildTracer filename (-p|-t) [query]");
+        }
+
+        private class Options
+        {
+            public bool Valid { get; private set; }
+
+            public Mode Mode { get; private set; }
+
+            public string Filename { get; private set; }
+
+            public string Query { get; private set; }
+
+            public static Options ProcessCommandLineArguments(string[] args)
+            {
+                var options = new Options();
+                if (args.Length < 2)
+                {
+                    options.Valid = false;
+                    return options;
+                }
+
+                options.Filename = args[0];
+
+                if (args[1] == "-p")
+                {
+                    options.Mode = Mode.Properties;
+                }
+                else if (args[1] == "-t")
+                {
+                    options.Mode = Mode.Targets;
+                }
+                else
+                {
+                    options.Valid = false;
+                }
+
+                options.Query = args.Length == 3 ? args[2] : "*";
+
+                options.Valid = true;
+                return options;
+            }
         }
     }
 }
