@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using MBEV = Microsoft.Build.Evaluation;
@@ -10,9 +11,21 @@ namespace MSBuildTracer
     static class Extensions
     {
         /// <summary>
+        /// Determines whether this property is a predecessor to another definition in the project.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="project">The project to look in</param>
+        /// <returns></returns>
+        public static bool IsPredecessor(this MBEV.ProjectProperty property, MBEV.Project project)
+        {
+            return project.AllEvaluatedProperties.Any(p => p.Predecessor == property);
+        }
+
+        /// <summary>
         /// Gets a collection of ProjectTargetInstances that this target is dependent on in a given project.
         /// </summary>
         /// <param name="target"></param>
+        /// <param name="project">The project to look in</param>
         /// <returns></returns>
         public static IEnumerable<MBEX.ProjectTargetInstance> Dependencies(
             this MBEX.ProjectTargetInstance target, MBEV.Project project)

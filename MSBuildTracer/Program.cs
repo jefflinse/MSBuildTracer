@@ -36,7 +36,8 @@ namespace MSBuildTracer
                 case Mode.Properties:
 
                     var properties = project.AllEvaluatedProperties.Where(
-                        p => PropertyTracer.PropertyNameMatchesPattern(p.Name, options.Query));
+                        p => PropertyTracer.PropertyNameMatchesPattern(p.Name, options.Query) &&
+                        !p.IsPredecessor(project));
 
                     if (!properties.Any())
                     {
