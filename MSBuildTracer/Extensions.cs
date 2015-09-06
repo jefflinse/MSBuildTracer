@@ -31,39 +31,43 @@ namespace MSBuildTracer
             this MBEX.ProjectTargetInstance target, MBEV.Project project)
         {
             var dependencies = new List<MBEX.ProjectTargetInstance>();
-            var dependencyValues = ExpandValues(target.DependsOnTargets, project);
+            var dependencyTargetNames = project.ResolveAllProperties(target.DependsOnTargets)
+                                       .Replace(Environment.NewLine, "")
+                                       .Split(';');
 
-            foreach (var name in dependencyValues)
+            foreach (var name in dependencyTargetNames)
             {
-                dependencies.Add(project.Targets[name]);
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    dependencies.Add(project.Targets[name.Trim()]);
+                }
             }
 
             return dependencies;
         }
 
-        private static IEnumerable<string> ExpandValues(string dependencyValue, MBEV.Project project)
+        /// <summary>
+        /// Fully resolves all properties in a given string.
+        /// </summary>
+        /// <param name="project"></param>
+        /// <param name="input">The string to resolve</param>
+        /// <returns></returns>
+        public static string ResolveAllProperties(this MBEV.Project project, string input)
         {
-            var retval = new List<string>();
+            var resolvedString = input;
+            var propertyRegex = new Regex(@"\$\(([\w\d_]+)\)", RegexOptions.Singleline);
+            Match match;
 
-            foreach (var potentialProperty in dependencyValue.Split(';'))
+            while ((match = propertyRegex.Match(resolvedString)).Success)
             {
-                var value = potentialProperty.Replace(Environment.NewLine, "").Trim();
-
-                // recursively expand properties and add their values to the list
-                var propertyRegex = new Regex(@"^\$\(([\w\d_]+)\)$");
-                var match = propertyRegex.Match(value);
-                if (match.Success)
+                while (match.Success)
                 {
-                    var rawPropertyValue = project.GetPropertyValue(match.Groups[1].Value);
-                    retval.AddRange(ExpandValues(rawPropertyValue, project));
-                }
-                else
-                {
-                    retval.Add(value);
+                    resolvedString = resolvedString.Replace($"$({match.Groups[1].Value})", project.GetPropertyValue(match.Groups[1].Value));
+                    match = match.NextMatch();
                 }
             }
 
-            return retval;
+            return resolvedString;
         }
     }
 }
