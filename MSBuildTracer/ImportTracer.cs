@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
 using MBEV = Microsoft.Build.Evaluation;
-using MBEX = Microsoft.Build.Execution;
 
 namespace MSBuildTracer
 {
     class ImportTracer
     {
-        private MBEV.Project project;
+        private readonly MBEV.Project project;
+        public bool ShowFullPath { get; set; }
 
         public ImportTracer(MBEV.Project project)
         {
@@ -31,26 +28,14 @@ namespace MSBuildTracer
                 }
 
                 int indent = indents[file];
-                PrintImportInfo(import.ImportedProject.Location.LocationString, indent);
-            }
-        }
-
-        public int TraceTree(int start, string prev, int indent)
-        {
-            int i = start;
-            while(i++ < project.Imports.Count) {
-                var import = project.Imports[i];
-                if (import.ImportingElement.ContainingProject.Location.File == prev)
+                string path = import.ImportingElement.Project;
+                if (ShowFullPath)
                 {
-                    PrintImportInfo(import.ImportedProject.Location.LocationString, indent);
+                    path = import.ImportedProject.Location.File;
                 }
-                else {
-                    i = TraceTree(i, import.ImportingElement.ContainingProject.Location.File, indent + 1);
-                    break;
-                }
-            }
 
-            return i;
+                PrintImportInfo(path, indent);
+            }
         }
 
         private void PrintImportInfo(string importProject, int indentCount)
