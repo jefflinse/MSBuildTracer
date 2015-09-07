@@ -1,49 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
 using MBEV = Microsoft.Build.Evaluation;
+using MBEX = Microsoft.Build.Execution;
 
 namespace MSBuildTracer
 {
     class ImportTracer
     {
-        private readonly MBEV.Project project;
-        public bool ShowFullPath { get; set; }
+        private MBEV.Project project;
 
         public ImportTracer(MBEV.Project project)
         {
             this.project = project;
         }
 
-        public void Trace()
+        public void Trace(MBEV.ResolvedImport import, int traceLevel = 0)
         {
-            IDictionary<string, int> indents = new Dictionary<string, int>();
-            int maxDepth = 0;
-            foreach (var import in project.Imports)
+            PrintImportInfo(import, traceLevel);
+
+            foreach (var childImport in project.Imports.Where(
+                i => string.Equals(i.ImportingElement.ContainingProject.FullPath,
+                                   project.ResolveAllProperties(import.ImportingElement.Project),
+                                   StringComparison.OrdinalIgnoreCase)))
             {
-                string file = import.ImportingElement.ContainingProject.Location.File;
-                if (!indents.ContainsKey(file))
-                {
-                    indents[file] = maxDepth++;
-                }
-
-                int indent = indents[file];
-                string path = import.ImportingElement.Project;
-                if (ShowFullPath)
-                {
-                    path = import.ImportedProject.Location.File;
-                }
-
-                PrintImportInfo(path, indent);
+                Trace(childImport, traceLevel + 1);
             }
         }
 
-        private void PrintImportInfo(string importProject, int indentCount)
+        private void PrintImportInfo(MBEV.ResolvedImport import, int indentCount)
         {
-            var indent = indentCount > 1 ? new StringBuilder().Insert(0, "|   ", indentCount - 1).ToString() : "";
-            var tree = indentCount > 0 ? "|   " : "";
+            var indent = indentCount > 0 ? new StringBuilder().Insert(0, "    ", indentCount).ToString() : "";
 
-            Console.WriteLine($"{indent}{tree}{importProject}");
+            Console.WriteLine($"{indent}{import.ImportingElement.Location.Line}: {project.ResolveAllProperties(import.ImportingElement.Project)}");
         }
     }
 }
