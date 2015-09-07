@@ -40,23 +40,9 @@ ResolveAssemblyReferences
 
 ##### Output
 ```
-$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props
-$(MSBuildToolsPath)\Microsoft.CSharp.targets
-|   $(MSBuildExtensionsPath)\4.0\Microsoft.Common.targets\ImportBefore\*
-|   $(CSharpTargetsPath)
-|   |   Microsoft.Common.targets
-|   |   |   $(MSBuildProjectFullPath).user
-|   |   |   Microsoft.NETFramework.props
-|   |   |   $(MSBuildToolsPath)\Microsoft.NETFramework.targets
-|   |   |   |   $(NetFrameworkTargetsPath)
-|   |   |   |   |   $(MSBuildToolsPath)\Microsoft.WinFX.targets
-|   |   |   |   |   |   $(MSBuildFrameworkToolsPath)\Microsoft.WinFx.targets
-|   |   |   |   |   $(MSBuildToolsPath)\Microsoft.Data.Entity.targets
-|   |   |   |   |   |   |   $(MSBuildFrameworkToolsPath)\Microsoft.Data.Entity.targets
-|   |   |   $(MSBuildToolsPath)\Microsoft.Xaml.targets
-|   |   |   |   |   |   |   |   $(MSBuildFrameworkToolsPath)\Microsoft.Xaml.targets
-|   |   |   $(MSBuildToolsPath)\Microsoft.WorkflowBuildExtensions.targets
-|   |   |   |   |   |   |   |   |   $(MSBuildFrameworkToolsPath)\Microsoft.WorkflowBuildExtensions.targets
-|   |   $(MSBuildToolsPath)\Microsoft.ServiceModel.targets
-|   |   |   |   |   |   |   |   |   |   $(MSBuildFrameworkToolsPath)\Microsoft.ServiceModel.targets
+3: C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.props
+
+84: C:\Program Files (x86)\MSBuild\14.0\bin\Microsoft.CSharp.targets
+    142: C:\Program Files (x86)\MSBuild\4.0\Microsoft.Common.targets\ImportBefore\*
+    154: C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\\Microsoft.CSharp.targets
 ```
