@@ -6,7 +6,7 @@ using MBEV = Microsoft.Build.Evaluation;
 
 namespace MSBuildTracer
 {
-    enum Mode { Properties, Targets };
+    enum Mode { Properties, Targets, Imports };
 
     class Program
     {
@@ -70,6 +70,14 @@ namespace MSBuildTracer
                     }
 
                     break;
+
+                case Mode.Imports:
+
+                    var importTracer = new ImportTracer(project);
+                    importTracer.Trace();
+                    Console.WriteLine();
+
+                    break;
             }
 
             return 0;
@@ -77,7 +85,7 @@ namespace MSBuildTracer
 
         private static void Usage()
         {
-            Console.WriteLine("usage:\n\tMSBuildTracer filename (-p|-t) [query]");
+            Console.WriteLine("usage:\n\tMSBuildTracer filename (-p|-t|-i) [query]");
         }
 
         private class Options
@@ -108,6 +116,10 @@ namespace MSBuildTracer
                 else if (args[1] == "-t")
                 {
                     options.Mode = Mode.Targets;
+                }
+                else if (args[1] == "-i")
+                {
+                    options.Mode = Mode.Imports;
                 }
                 else
                 {
