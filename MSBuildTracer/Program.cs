@@ -25,9 +25,11 @@ namespace MSBuildTracer
             {
                 project = new MBEV.Project(options.Filename);
             }
-            catch (Microsoft.Build.Exceptions.InvalidProjectFileException)
+            catch (Microsoft.Build.Exceptions.InvalidProjectFileException e)
             {
-                Console.WriteLine($"The project file '{args[1]}' is invalid or doesn't exist.");
+                Console.WriteLine($"The project file '{options.Filename}' is invalid or doesn't exist.");
+                Console.WriteLine();
+                Console.WriteLine(e.Message);
                 return 1;
             }
 
