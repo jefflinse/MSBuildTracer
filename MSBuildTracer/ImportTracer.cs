@@ -36,7 +36,9 @@ namespace MSBuildTracer
         {
             var indent = indentCount > 0 ? new StringBuilder().Insert(0, "    ", indentCount).ToString() : "";
 
-            Console.WriteLine($"{indent}{import.ImportingElement.Location.Line}: {project.ResolveAllProperties(import.ImportedProject.Location.File)}");
+            Utils.WriteColor(indent, ConsoleColor.White);
+            Utils.WriteColor($"{import.ImportingElement.Location.Line}: ", ConsoleColor.Cyan);
+            Utils.WriteLineColor(project.ResolveAllProperties(import.ImportedProject.Location.File), ConsoleColor.Green);
         }
     }
 }

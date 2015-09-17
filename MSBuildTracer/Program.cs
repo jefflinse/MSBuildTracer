@@ -68,7 +68,7 @@ namespace MSBuildTracer
 
                     foreach (var property in properties)
                     {
-                        Console.WriteLine($"[{property.Name}]");
+                        Utils.WriteLineColor($"[{property.Name}]", ConsoleColor.Cyan);
                         PropertyTracer.Trace(property);
                         Console.WriteLine();
                     }

@@ -50,6 +50,7 @@
     <Compile Include="PropertyTracer.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="TargetTracer.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

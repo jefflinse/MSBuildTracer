@@ -40,16 +40,20 @@ namespace MSBuildTracer
                 location = $"{property.Xml.Location.File}:{property.Xml.Location.Line}";
             }
 
-            Console.WriteLine($"{indent}Location:  {location}");
+            Utils.WriteColor($"{indent}Location:  ", ConsoleColor.White);
+            Utils.WriteLineColor(location, ConsoleColor.DarkCyan);
 
             if (property.UnevaluatedValue == property.EvaluatedValue)
             {
-                Console.WriteLine($"{indent}Value:     {property.EvaluatedValue}");
+                Utils.WriteColor($"{indent}Value:     ", ConsoleColor.White);
+                Utils.WriteLineColor(property.EvaluatedValue, ConsoleColor.Green);
             }
             else
             {
-                Console.WriteLine($"{indent}U-Value:   {property.UnevaluatedValue}");
-                Console.WriteLine($"{indent}E-Value:   {property.EvaluatedValue}");
+                Utils.WriteColor($"{indent}U-Value:   ", ConsoleColor.White);
+                Utils.WriteLineColor(property.UnevaluatedValue, ConsoleColor.DarkYellow);
+                Utils.WriteColor($"{indent}E-Value:   ", ConsoleColor.White);
+                Utils.WriteLineColor(property.EvaluatedValue, ConsoleColor.Green);
             }
         }
 
