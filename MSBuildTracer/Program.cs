@@ -49,7 +49,6 @@ namespace MSBuildTracer
                     foreach (var import in imports)
                     {
                         importTracer.Trace(import);
-                        Console.WriteLine();
                     }
 
                     break;
