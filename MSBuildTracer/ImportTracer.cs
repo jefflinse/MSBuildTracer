@@ -36,7 +36,7 @@ namespace MSBuildTracer
         {
             var indent = indentCount > 0 ? new StringBuilder().Insert(0, "    ", indentCount).ToString() : "";
 
-            Console.WriteLine($"{indent}{import.ImportingElement.Location.Line}: {project.ResolveAllProperties(import.ImportingElement.Project)}");
+            Console.WriteLine($"{indent}{import.ImportingElement.Location.Line}: {project.ResolveAllProperties(import.ImportedProject.Location.File)}");
         }
     }
 }
