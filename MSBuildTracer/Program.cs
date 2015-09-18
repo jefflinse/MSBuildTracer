@@ -116,6 +116,8 @@ namespace MSBuildTracer
             public static Options ProcessCommandLineArguments(string[] args)
             {
                 var options = new Options();
+                options.Valid = true;
+
                 if (args.Length < 2)
                 {
                     options.Valid = false;
@@ -143,7 +145,6 @@ namespace MSBuildTracer
 
                 options.Query = args.Length == 3 ? args[2] : "*";
 
-                options.Valid = true;
                 return options;
             }
         }
