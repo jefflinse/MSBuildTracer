@@ -69,19 +69,19 @@ namespace MSBuildTracer
                 location = $"{property.Xml.Location.File}:{property.Xml.Location.Line}";
             }
 
-            Utils.WriteColor($"{indent}Location:  ", ConsoleColor.White);
+            Utils.WriteColor($"{indent}Loc:  ", ConsoleColor.White);
             Utils.WriteLineColor(location, ConsoleColor.DarkCyan);
 
             if (property.UnevaluatedValue == property.EvaluatedValue)
             {
-                Utils.WriteColor($"{indent}Value:     ", ConsoleColor.White);
+                Utils.WriteColor($"{indent}Val:  ", ConsoleColor.White);
                 Utils.WriteLineColor(property.EvaluatedValue, ConsoleColor.Green);
             }
             else
             {
-                Utils.WriteColor($"{indent}U-Value:   ", ConsoleColor.White);
+                Utils.WriteColor($"{indent}Val:  ", ConsoleColor.White);
                 Utils.WriteLineColor(property.UnevaluatedValue, ConsoleColor.DarkGreen);
-                Utils.WriteColor($"{indent}E-Value:   ", ConsoleColor.White);
+                Utils.WriteColor($"{indent}      ", ConsoleColor.White);
                 Utils.WriteLineColor(property.EvaluatedValue, ConsoleColor.Green);
             }
         }
