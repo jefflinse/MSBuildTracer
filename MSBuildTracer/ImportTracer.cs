@@ -24,10 +24,7 @@ namespace MSBuildTracer
         {
             PrintImportInfo(import, traceLevel);
 
-            foreach (var childImport in project.Imports.Where(
-                i => string.Equals(i.ImportingElement.ContainingProject.FullPath,
-                                   project.ResolveAllProperties(import.ImportedProject.Location.File),
-                                   StringComparison.OrdinalIgnoreCase)))
+            foreach (var childImport in import.Children(project))
             {
                 Trace(childImport, traceLevel + $"{import.ImportingElement.Location.Line}: ".Length);
             }

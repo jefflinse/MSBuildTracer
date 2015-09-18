@@ -69,5 +69,13 @@ namespace MSBuildTracer
 
             return resolvedString;
         }
+
+        public static IEnumerable<MBEV.ResolvedImport> Children(this MBEV.ResolvedImport import, MBEV.Project project)
+        {
+            return project.Imports.Where(
+                i => string.Equals(i.ImportingElement.ContainingProject.FullPath,
+                                   project.ResolveAllProperties(import.ImportedProject.Location.File),
+                                   StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
