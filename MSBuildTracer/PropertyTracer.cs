@@ -51,7 +51,7 @@ namespace MSBuildTracer
             else
             {
                 Utils.WriteColor($"{indent}U-Value:   ", ConsoleColor.White);
-                Utils.WriteLineColor(property.UnevaluatedValue, ConsoleColor.DarkYellow);
+                Utils.WriteLineColor(property.UnevaluatedValue, ConsoleColor.DarkGreen);
                 Utils.WriteColor($"{indent}E-Value:   ", ConsoleColor.White);
                 Utils.WriteLineColor(property.EvaluatedValue, ConsoleColor.Green);
             }

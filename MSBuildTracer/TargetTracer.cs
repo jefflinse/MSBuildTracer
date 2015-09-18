@@ -38,10 +38,10 @@ namespace MSBuildTracer
         {
             var indent = indentCount > 1 ? new StringBuilder().Insert(0, "|   ", indentCount - 1).ToString() : "";
             var tree = indentCount > 0 ? "|   " : "";
-            var targetColor = indentCount == 0 ? ConsoleColor.Cyan : ConsoleColor.Green;
+            var targetColor = indentCount > 0 ? (target.Name.StartsWith("_") ? ConsoleColor.DarkGreen : ConsoleColor.Green) : ConsoleColor.Cyan;
 
             Utils.WriteColor(indent + tree, ConsoleColor.White);
-            Utils.WriteLineColor(target.Name, target.Name.StartsWith("_") ? ConsoleColor.DarkGreen : targetColor);
+            Utils.WriteLineColor(target.Name, targetColor);
         }
 
         public static bool TargetNameMatchesPattern(string targetName, string pattern)
