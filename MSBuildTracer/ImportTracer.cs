@@ -20,6 +20,23 @@ namespace MSBuildTracer
             this.project = project;
         }
 
+        public void TraceAll()
+        {
+            var imports = project.Imports.Where(i => !i.IsImported);
+
+            if (imports.Any())
+            {
+                foreach (var import in imports)
+                {
+                    Trace(import);
+                }
+            }
+            else
+            {
+                Console.WriteLine("This project does not import any other files.");
+            }
+        }
+
         public void Trace(MBEV.ResolvedImport import, int traceLevel = 0)
         {
             PrintImportInfo(import, traceLevel);

@@ -37,61 +37,17 @@ namespace MSBuildTracer
             {
                 case Mode.Imports:
 
-                    var imports = project.Imports.Where(i => !i.IsImported);
-
-                    if (!imports.Any())
-                    {
-                        Console.WriteLine("This project does not import any other files.");
-                        return 0;
-                    }
-
-                    var importTracer = new ImportTracer(project);
-                    foreach (var import in imports)
-                    {
-                        importTracer.Trace(import);
-                    }
-
+                    new ImportTracer(project).TraceAll();
                     break;
 
                 case Mode.Properties:
 
-                    var properties = project.AllEvaluatedProperties.Where(
-                        p => PropertyTracer.PropertyNameMatchesPattern(p.Name, options.Query) &&
-                        !p.IsPredecessor(project));
-
-                    if (!properties.Any())
-                    {
-                        Console.WriteLine($"No property matching '{options.Query}' is defined anywhere for this project.");
-                        return 0;
-                    }
-
-                    foreach (var property in properties)
-                    {
-                        Utils.WriteLineColor($"[{property.Name}]", ConsoleColor.Cyan);
-                        PropertyTracer.Trace(property);
-                        Console.WriteLine();
-                    }
-
+                    new PropertyTracer(project).TraceAll(options.Query);
                     break;
 
                 case Mode.Targets:
 
-                    var tracer = new TargetTracer(project);
-
-                    var targets = project.Targets.Where(t => TargetTracer.TargetNameMatchesPattern(t.Key, options.Query)).Select(t => t.Value);
-
-                    if (!targets.Any())
-                    {
-                        Console.WriteLine($"No target matching '{options.Query}' is defined anywhere for this project.");
-                        return 0;
-                    }
-
-                    foreach (var target in targets)
-                    {
-                        tracer.Trace(target);
-                        Console.WriteLine();
-                    }
-
+                    new TargetTracer(project).TraceAll(options.Query);
                     break;
             }
 

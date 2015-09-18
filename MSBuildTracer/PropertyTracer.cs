@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using MBEV = Microsoft.Build.Evaluation;
@@ -7,6 +8,34 @@ namespace MSBuildTracer
 {
     class PropertyTracer
     {
+        private MBEV.Project project;
+
+        public PropertyTracer(MBEV.Project project)
+        {
+            this.project = project;
+        }
+
+        public void TraceAll(string query)
+        {
+            var properties = project.AllEvaluatedProperties.Where(
+                p => PropertyTracer.PropertyNameMatchesPattern(p.Name, query) &&
+                !p.IsPredecessor(project));
+
+            if (properties.Any())
+            {
+                foreach (var property in properties)
+                {
+                    Utils.WriteLineColor($"[{property.Name}]", ConsoleColor.Cyan);
+                    PropertyTracer.Trace(property);
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No property matching '{query}' is defined anywhere for this project.");
+            }
+        }
+
         public static void Trace(MBEV.ProjectProperty property, int traceLevel = 0)
         {
             if (property == null || property.IsGlobalProperty || property.IsReservedProperty)

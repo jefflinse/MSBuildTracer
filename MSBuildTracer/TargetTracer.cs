@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -16,14 +17,32 @@ namespace MSBuildTracer
             this.project = project;
         }
 
-        public void Trace(MBEX.ProjectTargetInstance target, int traceLevel = 0)
+        public void TraceAll(string query)
+        {
+            var targets = project.Targets.Where(t => TargetTracer.TargetNameMatchesPattern(t.Key, query)).Select(t => t.Value);
+
+            if (targets.Any())
+            {
+                foreach (var target in targets)
+                {
+                    Trace(target);
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No target matching '{query}' is defined anywhere for this project.");
+            }
+        }
+
+        private void Trace(MBEX.ProjectTargetInstance target, int traceLevel = 0)
         {
             if (target == null)
             {
                 return;
             }
 
-            this.PrintTargetInfo(target, traceLevel);
+            PrintTargetInfo(target, traceLevel);
 
             if (!string.IsNullOrWhiteSpace(target.DependsOnTargets))
             {
@@ -34,7 +53,7 @@ namespace MSBuildTracer
             }
         }
 
-        private void PrintTargetInfo(MBEX.ProjectTargetInstance target, int indentCount)
+        private static void PrintTargetInfo(MBEX.ProjectTargetInstance target, int indentCount)
         {
             var indent = indentCount > 1 ? new StringBuilder().Insert(0, "|   ", indentCount - 1).ToString() : "";
             var tree = indentCount > 0 ? "|   " : "";
@@ -44,7 +63,7 @@ namespace MSBuildTracer
             Utils.WriteLineColor(target.Name, targetColor);
         }
 
-        public static bool TargetNameMatchesPattern(string targetName, string pattern)
+        private static bool TargetNameMatchesPattern(string targetName, string pattern)
         {
             return new Regex($"^{pattern.Replace("*", ".*")}$", RegexOptions.IgnoreCase).Match(targetName).Success;
         }
