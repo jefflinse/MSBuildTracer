@@ -77,5 +77,10 @@ namespace MSBuildTracer
                                    project.ResolveAllProperties(import.ImportedProject.Location.File),
                                    StringComparison.OrdinalIgnoreCase));
         }
+
+        public static string ReducedCondition(this MBEV.ResolvedImport import)
+        {
+            return Regex.Replace(import.ImportingElement.Condition, @"Exists\('.+'\)", "the file exists", RegexOptions.IgnoreCase);
+        }
     }
 }

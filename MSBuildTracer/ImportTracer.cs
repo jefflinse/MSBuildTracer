@@ -62,7 +62,7 @@ namespace MSBuildTracer
             if (!string.IsNullOrWhiteSpace(import.ImportingElement.Condition))
             {
                 Utils.WriteColor($"{indent}because ", ConsoleColor.DarkGray);
-                Utils.WriteLineColor($"{import.ImportingElement.Condition}", ConsoleColor.DarkCyan);
+                Utils.WriteLineColor($"{import.ReducedCondition()}", ConsoleColor.DarkCyan);
             }
 
             Console.WriteLine();
