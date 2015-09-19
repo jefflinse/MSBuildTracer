@@ -1,5 +1,5 @@
 # MSBuildTracer
-A tracer tool for querying MSBuild projects for properties, targets, imports, etc.
+A tracer tool for querying MSBuild projects for properties, targets, and imports.
 
 ## Properties
 
@@ -8,9 +8,9 @@ A tracer tool for querying MSBuild projects for properties, targets, imports, et
 ##### Output
 ```
 [CSharpTargetsPath]
-Location:  C:\Program Files (x86)\MSBuild\14.0\bin\Microsoft.CSharp.targets:36
-U-Value:   $(MSBuildFrameworkToolsPath)\Microsoft.CSharp.targets
-E-Value:   C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\\Microsoft.CSharp.targets
+Loc:  C:\Program Files (x86)\MSBuild\14.0\bin\Microsoft.CSharp.targets:36
+Val:  $(MSBuildFrameworkToolsPath)\Microsoft.CSharp.targets
+      C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\\Microsoft.CSharp.targets
 ```
 
 ## Targets
